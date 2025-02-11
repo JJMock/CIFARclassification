@@ -1,9 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import layers, models    
-
-# other imports
 import numpy as np
-#import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt - could not get this to work
 from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, Dropout
 from tensorflow.keras.layers import GlobalMaxPooling2D, MaxPooling2D
 from tensorflow.keras.layers import BatchNormalization
@@ -20,8 +18,35 @@ print(trainImages.shape, trainLabels.shape, testImages.shape, testLabels.shape)
 #(50000, 32, 32, 3) (50000, 1) (10000, 32, 32, 3) (10000, 1)
 
 #Normalize
-trainImages, testImages = trainImages / 255.0, testImages / 255.0
+trainImages, testImages = trainImages.astype('float32') / 255.0, testImages.astype('float32') / 255.0
 
 #Flatten 
 trainLabels, testLabels = trainLabels.flatten(), testLabels.flatten()
 
+#number of classes
+K = len(set(trainLabels))
+
+print("number of classes: ", K) 
+#Should be 10
+
+trainImages = trainImages.reshape((trainImages.shape[0], 32, 32, 3))
+testImages = testImages.reshape((testImages.shape[0], 32, 32, 3))
+
+model = models.Sequential([
+    #First layer: 32 3x3 kernels
+    layers.Conv2D(32, (3,3), activation='relu', input_shape=(32,32,3)),
+    layers.MaxPooling2D((2,2)),
+
+    #Second Conv layer: 64 3x3 kernels
+    layers.Conv2D(64, (3,3), activation='relu'),
+    layers.MaxPooling2D((2,2)),
+
+    #Third Conv layer: 64 3x3 kernels
+    layers.Conv2D(64, (3,3), activation='relu'),
+    layers.MaxPooling2D((2,2)),
+
+    layers.Flatten(),
+    layers.Dense(64, activation='relu'),
+    layers.Dense(32, activation='relu'),
+    layers.Dense(K,activation='softmax')
+])
