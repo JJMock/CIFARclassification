@@ -50,3 +50,14 @@ model = models.Sequential([
     layers.Dense(32, activation='relu'),
     layers.Dense(K,activation='softmax')
 ])
+
+model.compile(optimizer='adam',
+            loss='sparse_categorical_crossentropy',
+            metrics=['accuracy'])
+history = model.fit(trainImages, trainLabels,
+                    epochs=5,
+                    batch_size=64,
+                    validation_split=0.1)
+testLoss, testAcc = model.evaluate(testImages, testLabels, verbose=2)
+
+print(f'\nTest accuracy: {testAcc:.4f}')
